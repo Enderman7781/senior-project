@@ -1,7 +1,15 @@
 $(document).ready(function () {
-    //const url = 'https://example.com/data-source';
-    getPrediction().then(fetchedData => {
-        // 在這裡處理抓取到的資料
+    $('#predict').click(function () {
+        $(this).attr('disabled', 'true');  // 禁用按鈕
+        $('#spinner').addClass('spinner-border spinner-border-sm');  // 顯示加載動畫
+        $('#btn-text').text('預測中...');
+
+        console.log('Predicting');
+        getPrediction().always(() => {
+            $('#spinner').removeClass('spinner-border spinner-border-sm');  // 移除加載動畫
+            $(this).removeAttr('disabled');  // 重新啟用按鈕
+            $('#btn-text').text('開始預測');
+        });
     });
 });
 /*
@@ -50,23 +58,94 @@ async function getSpeed() {
         throw error;
     }
 }*/
-async function getPrediction() {
-    try {
-        const response = await fetch('http://localhost:5000/predict', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+function getPrediction() {
+    let option = {};
+    let divs_id = ['high_loads', 'open_shoulder', 'exit_close'];
+    for (const element of divs_id) {
+        let values = [];
+        let scope = "#" + element;
+        let checkBtn = $("#" + element + "_btn");
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (checkBtn.is(":checked")) {
+            $(scope + ' input[type="checkbox"]:checked').each(function () {
+                console.log("YES");
+                values.push($(this).val());
+            });
         }
+        option[element] = values;
 
-        const responseData = await response.text();
-        console.log('Fetched Data:', responseData);  // 打印後端返回的純文字資料
-        return responseData;
-    } catch (error) {
-        console.error('Error fetching prediction:', error);
     }
+
+    console.log(option);
+
+
+    return $.ajax({
+        url: 'http://localhost:5000/predict',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(option),
+        dataType: 'json',
+        success: function (responseData) {
+            console.log(responseData);  // The response is already parsed as JSON
+            updateTable(responseData);
+            // Do further processing with responseData here
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching prediction:', error);
+        }
+    });
+}
+
+// Assuming responseData is an array of objects
+function updateTable(responseData) {
+    responseData = JSON.parse(responseData);
+    responseData.forEach(data => {
+        console.log(data);
+        const start = data['起點路段'];
+        const end = data['終點路段'];
+        let speed = data['平均速度']; // Assuming your data object has a '速度' key for the speed information
+        let predict_speed = data['預測結果']
+
+        speed = Math.round(speed);
+        predict_speed = Math.round(predict_speed);
+        // Find the corresponding table cell(s) using jQuery
+        const tdId = `#${start}-${end}`; // 這裡假設ID的格式為 起點-終點
+        const tdPreId = tdId + "_PRE";
+
+        // 查找對應的td元素
+        const tdElement = $(tdId);
+        const tdPreElement = $(tdPreId);
+
+        if (tdElement) {
+            // 更新td的內容
+            if (predict_speed <= 20) {
+                tdElement.attr('class', 'interchange table-primary');
+            }
+            else if (speed <= 40) {
+                tdElement.attr('class', 'interchange table-danger');
+            }
+            else if (speed <= 60) {
+                tdElement.attr('class', 'interchange table-warning');
+            }
+            else {
+                tdElement.attr('class', 'interchange table-success');
+            }
+            tdElement.text(speed + "KM/hr");
+        }
+        if (tdPreElement) {
+            if (predict_speed <= 20) {
+                tdPreElement.attr('class', 'interchange table-primary');
+            }
+            else if (predict_speed <= 40) {
+                tdPreElement.attr('class', 'interchange table-danger');
+            }
+            else if (predict_speed <= 60) {
+                tdPreElement.attr('class', 'interchange table-warning');
+            }
+            else {
+                tdPreElement.attr('class', 'interchange table-success');
+            }
+            tdPreElement.text(predict_speed + "KM/hr");
+        }
+    });
 }

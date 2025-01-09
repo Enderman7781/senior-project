@@ -11,91 +11,267 @@
             text-align: center;
             font-weight: bold;
         }
+
+        .data {
+            text-align: center;
+            /*font-weight: bold;*/
+        }
     </style>
     <title>Document</title>
 </head>
 
 <body>
-    <h1>國道五號車流狀況預測</h1>
+    <h1 class="id">國道五號車流狀況預測</h1>
 
     <div class="container">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th scope="col-3" colspan="4">速度資訊</th>
-                    <th scope="col-3" colspan="2" rowspan="2">功能表</th>
+                    <th class="interchange" scope="col-3" colspan="4">速度資訊</th>
+                    <th class="interchange" scope="col-3" colspan="2" rowspan="2">功能表</th>
                 </tr>
                 <tr>
-                    <th class="interchange table-info" scope="col-3">改善預測速度(南下)</th>
+                    <th class="interchange table-info" scope="col-3">10分鐘後預測速度(南下)</th>
                     <th class="interchange table-info" scope="col-3">當前速度(南下)</th>
                     <th class="interchange table-info" scope="col-3">當前速度(北上)</th>
-                    <th class="interchange table-info" scope="col-3">改善預測速度(北上)</th>
+                    <th class="interchange table-info" scope="col-3">10分鐘後預測速度(北上)</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="interchange table-active" colspan="4">南港系統</td>
+
+                    <!--功能表區-->
                     <td rowspan="13">
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
-                                    <input type="checkbox" aria-label="Checkbox for following text input">
+                                    <input type="checkbox" aria-label="Checkbox for following text input"
+                                        id="high_loads_btn">
                                 </div>
                             </div>
                             <input disabled type="text" class="form-control" value="高乘載管制">
+                            <p>
+                                <button class="btn btn-outline-info" type="button" data-toggle="collapse"
+                                    data-target="#high_loads" aria-expanded="false" aria-controls="high_loads">
+                                    選取地點
+                                </button>
+                            </p>
+                            <div class="collapse" id="high_loads">
+                                <div class="card card-body">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" value="05F0000S-05F0055S"
+                                            id="">南下
+                                        南港系統->石碇
+                                        <input class="form-check-input" type="checkbox" value="05F0055S-05F0287S"
+                                            id="">南下
+                                        石碇 -> 坪林
+                                        <input class="form-check-input" type="checkbox" value="05F0287S-05F0309S"
+                                            id="">南下
+                                        雪山隧道-南口 -> 頭城
+                                        <input class="form-check-input" type="checkbox" value="05F0309S-05F0439S"
+                                            id="">南下
+                                        頭城 -> 宜蘭
+                                        <input class="form-check-input" type="checkbox" value="05FR113S-05F0439S"
+                                            id="">南下
+                                        宜蘭 -> 羅東
+                                        <input class="form-check-input" type="checkbox" value="05F0439S-05F0494S"
+                                            id="">南下
+                                        羅東 -> 蘇澳
+
+                                        <input class="form-check-input" type="checkbox" value="05F0055N-05F0001N"
+                                            id="">北上
+                                        石碇 -> 南港系統
+                                        <input class="form-check-input" type="checkbox" value="05F0287N-05F0055N"
+                                            id="">北上
+                                        坪林 -> 石碇
+                                        <input class="form-check-input" type="checkbox" value="05F0309N-05F0287N"
+                                            id="">北上
+                                        頭城 -> 雪山隧道-南口
+                                        <input class="form-check-input" type="checkbox" value="05F0438N-05F0309N"
+                                            id="">北上
+                                        宜蘭 -> 頭城
+                                        <input class="form-check-input" type="checkbox" value="05F0438N-05FR143N"
+                                            id="">北上
+                                        羅東 -> 宜蘭
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="checkbox" aria-label="Checkbox for following text input"
+                                        id="open_shoulder_btn">
+                                </div>
+                            </div>
+                            <input disabled type="text" class="form-control" value="開放路肩">
+                            <p>
+                                <button class="btn btn-outline-info" type="button" data-toggle="collapse"
+                                    data-target="#open_shoulder" aria-expanded="false" aria-controls="open_shoulder">
+                                    選取地點
+                                </button>
+                            </p>
+                            <div class="collapse" id="open_shoulder">
+                                <div class="card card-body">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" value="05F0000S-05F0055S"
+                                            id="">南下
+                                        南港系統->石碇
+                                        <input class="form-check-input" type="checkbox" value="05F0055S-05F0287S"
+                                            id="">南下
+                                        石碇 -> 坪林
+                                        <input class="form-check-input" type="checkbox" value="05F0287S-05F0309S"
+                                            id="">南下
+                                        雪山隧道-南口 -> 頭城
+                                        <input class="form-check-input" type="checkbox" value="05F0309S-05F0439S"
+                                            id="">南下
+                                        頭城 -> 宜蘭
+                                        <input class="form-check-input" type="checkbox" value="05FR113S-05F0439S"
+                                            id="">南下
+                                        宜蘭 -> 羅東
+                                        <input class="form-check-input" type="checkbox" value="05F0439S-05F0494S"
+                                            id="">南下
+                                        羅東 -> 蘇澳
+
+                                        <input class="form-check-input" type="checkbox" value="05F0055N-05F0001N"
+                                            id="">北上
+                                        石碇 -> 南港系統
+                                        <input class="form-check-input" type="checkbox" value="05F0287N-05F0055N"
+                                            id="">北上
+                                        坪林 -> 石碇
+                                        <input class="form-check-input" type="checkbox" value="05F0309N-05F0287N"
+                                            id="">北上
+                                        頭城 -> 雪山隧道-南口
+                                        <input class="form-check-input" type="checkbox" value="05F0438N-05F0309N"
+                                            id="">北上
+                                        宜蘭 -> 頭城
+                                        <input class="form-check-input" type="checkbox" value="05F0438N-05FR143N"
+                                            id="">北上
+                                        羅東 -> 宜蘭
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="checkbox" aria-label="Checkbox for following text input"
+                                        id="exit_close_btn">
+                                </div>
+                            </div>
+                            <input disabled type="text" class="form-control" value="匝道封閉">
+                            <p>
+                                <button class="btn btn-outline-info" type="button" data-toggle="collapse"
+                                    data-target="#exit_close" aria-expanded="false" aria-controls="exit_close">
+                                    選取地點
+                                </button>
+                            </p>
+                            <div class="collapse" id="exit_close">
+                                <div class="card card-body">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" value="05F0000S-05F0055S"
+                                            id="">南下
+                                        南港系統->石碇
+                                        <input class="form-check-input" type="checkbox" value="05F0055S-05F0287S"
+                                            id="">南下
+                                        石碇 -> 坪林
+                                        <input class="form-check-input" type="checkbox" value="05F0287S-05F0309S"
+                                            id="">南下
+                                        雪山隧道-南口 -> 頭城
+                                        <input class="form-check-input" type="checkbox" value="05F0309S-05F0439S"
+                                            id="">南下
+                                        頭城 -> 宜蘭
+                                        <input class="form-check-input" type="checkbox" value="05FR113S-05F0439S"
+                                            id="">南下
+                                        宜蘭 -> 羅東
+                                        <input class="form-check-input" type="checkbox" value="05F0439S-05F0494S"
+                                            id="">南下
+                                        羅東 -> 蘇澳
+
+                                        <input class="form-check-input" type="checkbox" value="05F0055N-05F0001N"
+                                            id="">北上
+                                        石碇 -> 南港系統
+                                        <input class="form-check-input" type="checkbox" value="05F0287N-05F0055N"
+                                            id="">北上
+                                        坪林 -> 石碇
+                                        <input class="form-check-input" type="checkbox" value="05F0309N-05F0287N"
+                                            id="">北上
+                                        頭城 -> 雪山隧道-南口
+                                        <input class="form-check-input" type="checkbox" value="05F0438N-05F0309N"
+                                            id="">北上
+                                        宜蘭 -> 頭城
+                                        <input class="form-check-input" type="checkbox" value="05F0438N-05FR143N"
+                                            id="">北上
+                                        羅東 -> 宜蘭
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary btn-block" type="button" id="predict">
+                                <span class="" role="status" aria-hidden="true" id="spinner"></span>
+                                <span id="btn-text">開始預測</span>
+                            </button>
                         </div>
                     </td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="data" id="05F0000S-05F0055S_PRE"></td>
+                    <td class="data" id="05F0000S-05F0055S"></td>
+                    <td class="data" id="05F0055N-05F0001N"></td>
+                    <td class="data" id="05F0055N-05F0001N_PRE"></td>
                 </tr>
                 <tr>
                     <td class="interchange table-active" colspan="4">石碇</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="data" id="05F0055S-05F0287S_PRE"></td>
+                    <td class="data" id="05F0055S-05F0287S"></td>
+                    <td class="data" id="05F0287N-05F0055N"></td>
+                    <td class="data" id="05F0287N-05F0055N_PRE"></td>
                 </tr>
                 <tr>
                     <td class="interchange table-active" colspan="4">坪林</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="interchange table-active" colspan="4">雪山隧道-南口</td>
+                </tr>
+                <tr>
+                    <td class="data" id="05F0287S-05F0309S_PRE"></td>
+                    <td class="data" id="05F0287S-05F0309S"></td>
+                    <td class="data" id="05F0309N-05F0287N"></td>
+                    <td class="data" id="05F0309N-05F0287N_PRE"></td>
                 </tr>
                 <tr>
                     <td class="interchange table-active" colspan="4">頭城</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="data" id="05F0309S-05F0439S_PRE"></td>
+                    <td class="data" id="05F0309S-05F0439S"></td>
+                    <td class="data" id="05F0438N-05F0309N"></td>
+                    <td class="data" id="05F0438N-05F0309N_PRE"></td>
                 </tr>
                 <tr>
                     <td class="interchange table-active" colspan="4">宜蘭</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="data" id="05FR113S-05F0439S_PRE"></td>
+                    <td class="data" id="05FR113S-05F0439S"></td>
+                    <td class="data" id="05F0528N-05F0438N"></td>
+                    <td class="data" id="05F0528N-05F0438N_PRE"></td>
                 </tr>
                 <tr>
                     <td class="interchange table-active" colspan="4">羅東</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="data" id="05F0439S-05F0494S_PRE"></td>
+                    <td class="data" id="05F0439S-05F0494S"></td>
+                    <td class="data table-secondary">資料不足</td>
+                    <td class="data table-secondary">資料不足</td>
                 </tr>
                 <tr>
                     <td class="interchange table-active" colspan="4">蘇澳</td>
@@ -103,6 +279,7 @@
             </tbody>
         </table>
     </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
@@ -110,6 +287,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
         crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="./index.js"></script>
 </body>
 

@@ -66,7 +66,7 @@ def fetch_data():
     df = pd.DataFrame(data)
     return df
 
-def filterData(scraped_data):
+def filterData(scraped_data,requirement):
     h5_str = '05F'
     
     # Step 1: 過濾資料
@@ -76,48 +76,64 @@ def filterData(scraped_data):
     filtered_data[4] = pd.to_numeric(filtered_data[4], errors='coerce')
     filtered_data[5] = pd.to_numeric(filtered_data[5], errors='coerce')
 
-    # Step 2: 分群並計算加總，只保留每組的第一列
+    # Step 2: 分群並計算每组的平均速度，保留每组的第一列
     grouped_data = filtered_data.groupby(1).apply(
-        lambda group: group.assign(SUM_5=group[5].sum()).iloc[0:1]
+        lambda group: group.assign(平均速度=(group[4] * group[5] / group[5].sum())).iloc[0:1]
     )
 
-    # Step 3: 更新欄位 [4] 的值
-    grouped_data[4] = grouped_data.apply(
-        lambda row: (row[4] * row[5] / row['SUM_5']) if row['SUM_5'] != 0 else np.nan,
-        axis=1
-    )
-
-    # Step 4: 刪除欄位 [3]
+    # Step 3: 刪除欄位 [3]
     grouped_data = grouped_data.drop(columns=[3])
 
-    # Step 5: 刪除輔助欄位並重新命名欄位
-    result_data = grouped_data.drop(columns=['SUM_5'])
-    result_data.columns = ['時間', '起點路段', '終點路段', '平均速度', '車流數量']
+    # Step 4: 確認列名數量正確
+    grouped_data.columns = ['時間', '起點路段', '終點路段', '平均速度', '車流數量', '原始速度']
     
-    # Step 6: 轉換 '時間' 欄位為日期時間格式
-    result_data['時間'] = pd.to_datetime(result_data['時間'])
-    
-    return create_features(result_data)
+    # Step 5: 如果不需要 "原始速度" 列，可以刪除該列
+    grouped_data = grouped_data.drop(columns=['原始速度'])
 
-def create_features(df):
+    # Step 6: 轉換 '時間' 欄位為日期時間格式
+    grouped_data['時間'] = pd.to_datetime(grouped_data['時間'])
+    
+    return create_features(grouped_data,requirement)
+
+def create_features(df, requirement):
+    # Step 1: Add 10 minutes to '時間' column
+    df['時間'] = df['時間'] + pd.Timedelta(minutes=10)
+    
+    # Step 2: Extract time-related features
     df['hour'] = df['時間'].dt.hour
     df['dayofweek'] = df['時間'].dt.dayofweek
     df['month'] = df['時間'].dt.month
+    
+    # Step 3: Calculate lag and moving average features
     df['lag1'] = df['平均速度'].shift(1)
     df['lag2'] = df['平均速度'].shift(2)
     df['moving_avg_3'] = df['平均速度'].rolling(window=3).mean()
-    #df['high_load'] = ((df['dayofweek'] == 6) & (df['hour'] >= 15) & (df['hour'] <= 20)).astype(int)
-    df['is_weekend'] = df['dayofweek'].isin([5, 6]).astype(int)
-    # 新增手段A特征
-    #df['高乘載'] = ((df['dayofweek'] == 6) & (df['hour'] >= 15) & (df['hour'] <= 20)).astype(int)  # 示例逻辑
     
+    # Step 4: Add weekend feature
+    df['is_weekend'] = df['dayofweek'].isin([5, 6]).astype(int)
+    
+    # Step 5: Initialize features to 0
     df['高乘載'] = 0
     df['匝道封閉'] = 0
     df['路肩開放'] = 0  
     df['車禍'] = 0
-
-    df = df.dropna()  # 去除NaN值
+    
+    # Step 6: Update features based on requirement JSON
+    for index, row in df.iterrows():
+        start_end_string = f"{row['起點路段']}-{row['終點路段']}"
+        if start_end_string in requirement.get('high_load', []):
+            df.at[index, '高乘載'] = 1
+        if start_end_string in requirement.get('exit_close', []):
+            df.at[index, '匝道封閉'] = 1
+        if start_end_string in requirement.get('open_shoulder', []):
+            df.at[index, '路肩開放'] = 1
+    
+    # Step 7: Remove any rows with NaN values
+    df = df.dropna()
+    print(df)
+    
     return df
+
 
 def predict_new_data(new_data, encoder, scaler, model, route_dict):
     # If the input is a dictionary, convert it to a DataFrame
@@ -175,13 +191,15 @@ def predict_new_data(new_data, encoder, scaler, model, route_dict):
 @app.route('/predict', methods=['POST'])
 def predict():
     
+    option_data = request.get_json()
+    
     # 爬取數據
     scraped_data = fetch_data()
     if scraped_data.empty:
         return jsonify({'error': 'Failed to fetch data from URL'}), 500
     # 留下可用資料
     
-    useful_data = filterData(scraped_data=scraped_data)
+    useful_data = filterData(scraped_data=scraped_data,requirement=option_data)
     model_to_gate = {
         ('03F0201N','05F0000S'):'南港(3)_to_南港系統',
         ('03F0158S','05F0000S'):'木柵and南深路(3)_to_南港系統',

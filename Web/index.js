@@ -80,7 +80,7 @@ function getPrediction() {
 
 
     return $.ajax({
-        url: 'http://10.21.44.135:5000/predict',
+        url: 'https://10.21.44.135:5000/predict',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(option),
